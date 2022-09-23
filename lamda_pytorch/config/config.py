@@ -1,16 +1,16 @@
 from typing import Optional, ClassVar, List
 from dataclasses import dataclass, field
 
+
 @dataclass
 class CFG:
-
     """
     Configuration for ZeRO
     """
 
     use_zero: bool = field(
-        default = False,
-        metadata = {'help': 'whether to use zero'}
+        default=False,
+        metadata={'help': 'whether to use zero'}
     )
 
     """
@@ -18,8 +18,8 @@ class CFG:
     """
 
     lr: float = field(
-        default = 0.0001,
-        metadata = {'help': 'learning rate'}
+        default=0.0001,
+        metadata={'help': 'learning rate'}
     )
 
     """
@@ -27,28 +27,28 @@ class CFG:
     """
 
     num_tokens: int = field(
-        default = 50257,
-        metadata = {'help': 'number of tokens'}
+        default=50257,
+        metadata={'help': 'number of tokens'}
     )
 
     dim: int = field(
-        default = 512,
-        metadata = {'help': 'dimension of the embedding'}
+        default=512,
+        metadata={'help': 'dimension of the embedding'}
     )
 
     depth: int = field(
-        default = 6,
-        metadata = {'help': 'depth of the transformer'}
+        default=6,
+        metadata={'help': 'depth of the transformer'}
     )
 
     heads: int = field(
-        default = 4,
-        metadata = {'help': 'number of heads in the transformer'}
+        default=4,
+        metadata={'help': 'number of heads in the transformer'}
     )
 
     dim_head: int = field(
-        default = 64,
-        metadata = {'help': 'dimension of the head'}
+        default=64,
+        metadata={'help': 'dimension of the head'}
     )
 
     """
@@ -56,42 +56,42 @@ class CFG:
     """
 
     use_huggingface: bool = field(
-        default = True,
-        metadata = {'help': 'Whether to use huggingface datasets'}
+        default=True,
+        metadata={'help': 'Whether to use huggingface datasets'}
     )
 
     train_dataset_name: Optional[str] = field(
-        default="the_pile", 
+        default="wikitext",
         metadata={"help": "Path to Hugging Face training dataset."}
     )
 
     eval_dataset_name: Optional[str] = field(
-        default="the_pile", 
+        default="wikitext",
         metadata={"help": "Path to Hugging Face validation dataset."}
     )
 
     choose_train_split: Optional[str] = field(
-        default="train", 
+        default="train",
         metadata={"help": "Choose Hugging Face training dataset split."}
     )
 
     choose_eval_split: Optional[str] = field(
-        default="train", 
+        default="train",
         metadata={"help": "Choose Hugging Face validation dataset split."}
     )
 
     remove_train_columns: ClassVar[List[str]] = field(
-        default = ['meta'], 
+        default=[],     # 'meta'
         metadata={"help": "Train dataset columns to remove."}
     )
 
     remove_eval_columns: ClassVar[List[str]] = field(
-        default = ['meta'], 
+        default=[],     # 'meta'
         metadata={"help": "Validation dataset columns to remove."}
     )
 
     seed: Optional[int] = field(
-        default=42, 
+        default=42,
         metadata={"help": "Random seed used for reproducibility."}
     )
 
@@ -101,22 +101,22 @@ class CFG:
     )
 
     tokenizer_seq_length: Optional[int] = field(
-        default=512, 
+        default=512,
         metadata={"help": "Sequence lengths used for tokenizing examples."}
     )
 
     select_input_string: Optional[str] = field(
-        default="text", 
+        default="text",
         metadata={"help": "Select the key to used as the input string column."}
     )
-    
+
     batch_size: Optional[int] = field(
-        default=16, 
+        default=16,
         metadata={"help": "Batch size for training and validation."}
     )
 
     save_to_path: Optional[str] = field(
-        default="''", 
+        default="''",
         metadata={"help": "Save the dataset to local disk."}
     )
 
@@ -125,11 +125,11 @@ class CFG:
     """
 
     use_wandb: bool = field(
-        default = False,
-        metadata = {'help': 'Whether to use Weights and Biases for logging'}
+        default=True,
+        metadata={'help': 'Whether to use Weights and Biases for logging'}
     )
 
     project_name: Optional[str] = field(
         default="LaMDA pre-training",
-        metadata = {'help': 'Name of the project'}
+        metadata={'help': 'Name of the project'}
     )
