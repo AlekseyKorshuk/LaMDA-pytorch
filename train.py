@@ -92,7 +92,8 @@ def LaMDA_Trainer(cfg: CFG):
             engine.zero_grad()
             outputs = engine(inputs)
 
-            train_loss = engine.loss_fn(outputs, labels)
+            train_loss = engine.criterion(outputs, labels)
+            print()
             wandb.log({"train_loss": train_loss})
 
             engine.backward(train_loss)
@@ -105,7 +106,7 @@ def LaMDA_Trainer(cfg: CFG):
 
                 with torch.no_grad():
                     outputs = engine(inputs)
-                    test_loss = engine.loss_fn(outputs, labels)
+                    test_loss = engine.criterion(outputs, labels)
                     wandb.log({"test_loss": test_loss})
 
                 engine.backward(test_loss)
