@@ -15,6 +15,7 @@ from lamda_pytorch.utils.utils import LaMDA_Loss, AutoregressiveWrapper
 
 from transformers import AutoTokenizer
 
+
 def LaMDA_Trainer(cfg: CFG):
     assert torch.cuda.is_available()
     disable_existing_loggers()
@@ -33,8 +34,8 @@ def LaMDA_Trainer(cfg: CFG):
         pass
     else:
         colossalai.launch_from_torch(
-            config='./lamda_pytorch/config/colossal_config.py', 
-            seed = cfg.seed
+            config='./lamda_pytorch/config/colossal_config.py',
+            seed=cfg.seed
         )
 
     assert hasattr(gpc.config, "EPOCHS"), "Please provide NUM_EPOCHS in your configuration"
@@ -58,8 +59,8 @@ def LaMDA_Trainer(cfg: CFG):
     # optimizer function
 
     optimizer = torch.optim.AdamW(
-        model.parameters(), 
-        lr = gpc.config.LEARNING_RATE,
+        model.parameters(),
+        lr=gpc.config.LEARNING_RATE,
         weight_decay=gpc.config.WEIGHT_DECAY
     )
 
@@ -69,7 +70,7 @@ def LaMDA_Trainer(cfg: CFG):
         model,
         optimizer,
         loss_fn,
-        train_dataloader = train_dataloader
+        train_dataloader=train_dataloader
     )
 
     def batch_data_process_func(batch_data):
@@ -82,13 +83,12 @@ def LaMDA_Trainer(cfg: CFG):
     if cfg.use_wandb == True:
 
         # initialize Weights and Biases Logging
-        wandb.init(project = cfg.project_name)
+        wandb.init(project=cfg.project_name)
 
         engine.train()
         for step, batch in enumerate(train_dataloader):
-            print(batch)
-            inputs, labels = batch['inputs'].cuda(), batch['labels'].cuda()
-            
+            inputs, labels = batch['input_ids'].cuda(), batch['labels'].cuda()
+
             engine.zero_grad()
             outputs = engine(inputs)
 
@@ -98,22 +98,22 @@ def LaMDA_Trainer(cfg: CFG):
             engine.backward(train_loss)
             engine.step()
             wandb.log({"step": step})
-            
+
             engine.eval()
             for step, batch in enumerate(eval_dataloader):
-                inputs, labels = batch['inputs'].cuda(), batch['labels'].cuda()
+                inputs, labels = batch['input_ids'].cuda(), batch['labels'].cuda()
 
                 with torch.no_grad():
                     outputs = engine(inputs)
                     test_loss = engine.loss_fn(outputs, labels)
                     wandb.log({"test_loss": test_loss})
-                
+
                 engine.backward(test_loss)
                 engine.step()
 
         wandb.alert(
-            title = 'Training Complete',
-            text = "Training complete."
+            title='Training Complete',
+            text="Training complete."
         )
 
     else:
@@ -123,9 +123,9 @@ def LaMDA_Trainer(cfg: CFG):
 
         # trainer
         trainer = Trainer(
-            engine = engine,
-            timer =  timer,
-            logger = logger
+            engine=engine,
+            timer=timer,
+            logger=logger
         )
 
         hook_list = [
@@ -135,14 +135,14 @@ def LaMDA_Trainer(cfg: CFG):
         ]
 
         trainer.fit(
-            train_dataloader = train_dataloader,
-            epochs = gpc.config.EPOCHS,
-            hooks = hook_list,
-            display_progress = True
+            train_dataloader=train_dataloader,
+            epochs=gpc.config.EPOCHS,
+            hooks=hook_list,
+            display_progress=True
         )
 
-if __name__ == "__main__":
 
+if __name__ == "__main__":
     cfg = CFG()
 
     LaMDA_Trainer(cfg)
