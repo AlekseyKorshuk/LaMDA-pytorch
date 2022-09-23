@@ -86,7 +86,7 @@ def LaMDA_Trainer(cfg: CFG):
 
         engine.train()
         for step, batch in enumerate(train_dataloader):
-
+            print(batch)
             inputs, labels = batch['inputs'].cuda(), batch['labels'].cuda()
             
             engine.zero_grad()
