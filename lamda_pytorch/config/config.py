@@ -135,7 +135,7 @@ class CFG:
     """
 
     use_wandb: bool = field(
-        default=True,
+        default=False,
         metadata={'help': 'Whether to use Weights and Biases for logging'}
     )
 
