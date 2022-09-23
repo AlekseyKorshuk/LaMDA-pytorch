@@ -65,9 +65,19 @@ class CFG:
         metadata={"help": "Path to Hugging Face training dataset."}
     )
 
+    train_dataset_config_name: Optional[str] = field(
+        default='wikitext-103-v1',
+        metadata={"help": "Train config name."}
+    )
+
     eval_dataset_name: Optional[str] = field(
         default="wikitext",
         metadata={"help": "Path to Hugging Face validation dataset."}
+    )
+
+    eval_dataset_config_name: Optional[str] = field(
+        default='wikitext-103-v1',
+        metadata={"help": "Validation config name."}
     )
 
     choose_train_split: Optional[str] = field(
