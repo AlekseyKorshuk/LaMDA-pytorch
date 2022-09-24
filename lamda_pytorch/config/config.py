@@ -61,22 +61,22 @@ class CFG:
     )
 
     train_dataset_name: Optional[str] = field(
-        default="wikitext",
+        default="huggingartists/eminem",
         metadata={"help": "Path to Hugging Face training dataset."}
     )
 
     train_dataset_config_name: Optional[str] = field(
-        default='wikitext-103-v1',
+        default=None,
         metadata={"help": "Train config name."}
     )
 
     eval_dataset_name: Optional[str] = field(
-        default="wikitext",
+        default="huggingartists/eminem",
         metadata={"help": "Path to Hugging Face validation dataset."}
     )
 
     eval_dataset_config_name: Optional[str] = field(
-        default='wikitext-103-v1',
+        default=None,
         metadata={"help": "Validation config name."}
     )
 

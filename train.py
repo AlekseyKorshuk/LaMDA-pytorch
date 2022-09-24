@@ -103,7 +103,7 @@ def LaMDA_Trainer(cfg: CFG):
         model.train()
         for step, batch in enumerate(train_dataloader):
             batch.to(accelerator.device)
-            inputs, labels = batch['input_ids'].cuda(), batch['labels'].cuda()
+            inputs, labels = batch['input_ids'], batch['labels']
 
             # engine.zero_grad()
             outputs = model(inputs)
