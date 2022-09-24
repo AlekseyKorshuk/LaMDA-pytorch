@@ -17,13 +17,13 @@ from transformers import AutoTokenizer
 
 from accelerate import Accelerator, DistributedType
 
-
 EPOCHS = 1
 LEARNING_RATE = 0.0001
 WEIGHT_DECAY = 1e-2
 
 gradient_accumulation = 1
 clip_grad_norm = 0.0
+
 
 def LaMDA_Trainer(cfg: CFG):
     assert torch.cuda.is_available()
@@ -110,7 +110,7 @@ def LaMDA_Trainer(cfg: CFG):
             outputs = model(inputs)
 
             train_loss = loss_fn.forward(outputs, labels)
-            print()
+
             wandb.log({"train_loss": train_loss})
 
             accelerator.backward(train_loss)
@@ -118,9 +118,11 @@ def LaMDA_Trainer(cfg: CFG):
             optimizer.zero_grad()
             wandb.log({"step": step})
 
+            print("Evaluating!")
             model.eval()
             for step, batch in enumerate(eval_dataloader):
-                inputs, labels = batch['input_ids'].cuda(), batch['labels'].cuda()
+                batch.to(accelerator.device)
+                inputs, labels = batch['input_ids'], batch['labels']
 
                 with torch.no_grad():
                     outputs = model(inputs)
