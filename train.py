@@ -52,8 +52,8 @@ def LaMDA_Trainer(cfg: CFG):
     # assert hasattr(gpc.config, "EPOCHS"), "Please provide NUM_EPOCHS in your configuration"
 
     # Colossal logger
-    logger = get_dist_logger()
-    logger.info("Initialized environment", ranks=[0])
+    # logger = get_dist_logger()
+    # logger.info("Initialized environment", ranks=[0])
 
     # LaMDA model
     model = lamda_model()
@@ -141,15 +141,15 @@ def LaMDA_Trainer(cfg: CFG):
 
         # trainer
         trainer = Trainer(
-            engine=engine,
+            # engine=engine,
             timer=timer,
-            logger=logger
+            # logger=logger
         )
 
         hook_list = [
             hooks.LogMetricByStepHook(),
             hooks.LossHook(),
-            hooks.LogMetricByEpochHook(logger)
+            # hooks.LogMetricByEpochHook(logger)
         ]
 
         trainer.fit(
