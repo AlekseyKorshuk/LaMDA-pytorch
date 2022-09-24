@@ -103,6 +103,7 @@ def LaMDA_Trainer(cfg: CFG):
         model.train()
         print(len(train_dataloader))
         for step, batch in enumerate(train_dataloader):
+            print("here")
             batch.to(accelerator.device)
             inputs, labels = batch['input_ids'], batch['labels']
 
