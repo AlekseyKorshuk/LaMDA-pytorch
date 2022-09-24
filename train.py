@@ -101,6 +101,7 @@ def LaMDA_Trainer(cfg: CFG):
         wandb.init(project=cfg.project_name)
 
         model.train()
+        print(len(train_dataloader))
         for step, batch in enumerate(train_dataloader):
             batch.to(accelerator.device)
             inputs, labels = batch['input_ids'], batch['labels']
