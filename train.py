@@ -18,6 +18,13 @@ from transformers import AutoTokenizer
 from accelerate import Accelerator, DistributedType
 
 
+EPOCHS = 1
+LEARNING_RATE = 0.0001
+WEIGHT_DECAY = 1e-2
+
+gradient_accumulation = 1
+clip_grad_norm = 0.0
+
 def LaMDA_Trainer(cfg: CFG):
     assert torch.cuda.is_available()
     disable_existing_loggers()
@@ -33,16 +40,16 @@ def LaMDA_Trainer(cfg: CFG):
     args = parser.parse_args()
 
     accelerator = Accelerator()
+    #
+    # if cfg.use_zero == True:
+    #     pass
+    # else:
+    #     colossalai.launch_from_torch(
+    #         config='./lamda_pytorch/config/colossal_config.py',
+    #         seed=cfg.seed
+    #     )
 
-    if cfg.use_zero == True:
-        pass
-    else:
-        colossalai.launch_from_torch(
-            config='./lamda_pytorch/config/colossal_config.py',
-            seed=cfg.seed
-        )
-
-    assert hasattr(gpc.config, "EPOCHS"), "Please provide NUM_EPOCHS in your configuration"
+    # assert hasattr(gpc.config, "EPOCHS"), "Please provide NUM_EPOCHS in your configuration"
 
     # Colossal logger
     logger = get_dist_logger()
@@ -64,8 +71,8 @@ def LaMDA_Trainer(cfg: CFG):
 
     optimizer = torch.optim.AdamW(
         model.parameters(),
-        lr=gpc.config.LEARNING_RATE,
-        weight_decay=gpc.config.WEIGHT_DECAY
+        lr=LEARNING_RATE,
+        weight_decay=WEIGHT_DECAY
     )
 
     # initialze model, optimizer, criterion, and data loaders
@@ -147,7 +154,7 @@ def LaMDA_Trainer(cfg: CFG):
 
         trainer.fit(
             train_dataloader=train_dataloader,
-            epochs=gpc.config.EPOCHS,
+            epochs=EPOCHS,
             hooks=hook_list,
             display_progress=True
         )
