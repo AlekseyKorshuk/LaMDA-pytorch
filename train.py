@@ -15,6 +15,8 @@ from lamda_pytorch.utils.utils import LaMDA_Loss, AutoregressiveWrapper
 
 from transformers import AutoTokenizer
 
+from accelerate import Accelerator, DistributedType
+
 
 def LaMDA_Trainer(cfg: CFG):
     assert torch.cuda.is_available()
@@ -29,6 +31,8 @@ def LaMDA_Trainer(cfg: CFG):
     )
 
     args = parser.parse_args()
+
+    accelerator = Accelerator()
 
     if cfg.use_zero == True:
         pass
@@ -66,11 +70,15 @@ def LaMDA_Trainer(cfg: CFG):
 
     # initialze model, optimizer, criterion, and data loaders
 
-    engine, train_dataloader, _, _ = colossalai.initialize(
-        model,
-        optimizer,
-        loss_fn,
-        train_dataloader=train_dataloader
+    # engine, train_dataloader, _, _ = colossalai.initialize(
+    #     model,
+    #     optimizer,
+    #     loss_fn,
+    #     train_dataloader=train_dataloader
+    # )
+
+    model, optimizer, train_dataloader, eval_dataloader = accelerator.prepare(
+        model, optimizer, train_dataloader, eval_dataloader
     )
 
     def batch_data_process_func(batch_data):
@@ -78,39 +86,41 @@ def LaMDA_Trainer(cfg: CFG):
         labels = batch_data["labels"]
         return data, labels
 
-    engine.schedule.batch_data_process_func = batch_data_process_func
+    # engine.schedule.batch_data_process_func = batch_data_process_func
 
     if cfg.use_wandb == True:
 
         # initialize Weights and Biases Logging
         wandb.init(project=cfg.project_name)
 
-        engine.train()
+        model.train()
         for step, batch in enumerate(train_dataloader):
+            batch.to(accelerator.device)
             inputs, labels = batch['input_ids'].cuda(), batch['labels'].cuda()
 
-            engine.zero_grad()
-            outputs = engine(inputs)
+            # engine.zero_grad()
+            outputs = model(inputs)
 
-            train_loss = engine.criterion(outputs, labels)
+            train_loss = loss_fn.forward(outputs, labels)
             print()
             wandb.log({"train_loss": train_loss})
 
-            engine.backward(train_loss)
-            engine.step()
+            accelerator.backward(train_loss)
+            optimizer.step()
+            optimizer.zero_grad()
             wandb.log({"step": step})
 
-            engine.eval()
+            model.eval()
             for step, batch in enumerate(eval_dataloader):
                 inputs, labels = batch['input_ids'].cuda(), batch['labels'].cuda()
 
                 with torch.no_grad():
-                    outputs = engine(inputs)
-                    test_loss = engine.criterion(outputs, labels)
+                    outputs = model(inputs)
+                    test_loss = loss_fn.forward(outputs, labels)
                     wandb.log({"test_loss": test_loss})
 
-                engine.backward(test_loss)
-                engine.step()
+                # engine.backward(test_loss)
+                # engine.step()
 
         wandb.alert(
             title='Training Complete',
