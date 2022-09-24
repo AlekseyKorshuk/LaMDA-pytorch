@@ -34,13 +34,13 @@ def LaMDA_Trainer(cfg: CFG):
 
     accelerator = Accelerator()
 
-    # if cfg.use_zero == True:
-    #     pass
-    # else:
-    #     colossalai.launch_from_torch(
-    #         config='./lamda_pytorch/config/colossal_config.py',
-    #         seed=cfg.seed
-    #     )
+    if cfg.use_zero == True:
+        pass
+    else:
+        colossalai.launch_from_torch(
+            config='./lamda_pytorch/config/colossal_config.py',
+            seed=cfg.seed
+        )
 
     assert hasattr(gpc.config, "EPOCHS"), "Please provide NUM_EPOCHS in your configuration"
 
