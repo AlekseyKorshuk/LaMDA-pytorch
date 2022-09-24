@@ -107,7 +107,9 @@ def LaMDA_Trainer(cfg: CFG):
             inputs, labels = batch['input_ids'], batch['labels']
 
             # engine.zero_grad()
+            print("outputs = model(inputs)")
             outputs = model(inputs)
+            print("done")
 
             train_loss = loss_fn.forward(outputs, labels)
 
